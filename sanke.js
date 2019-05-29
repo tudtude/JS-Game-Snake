@@ -31,6 +31,8 @@ food = {
 
 function draw(){
     if( checkGameOver() ) {
+        displayContext.font = '20px Georgia'
+        displayContext.fillText('Game Over', 100, 150)
         return false
     }
     
