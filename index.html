@@ -154,6 +154,7 @@
             snake.direction = null
             snake.body = [{ x: 50, y: 50}]
             score = 0
+            document.getElementById('score').innerHTML = 'Your score ' + score
             clearInterval( gameInterval )
             gameInterval = setInterval(draw, 1000 / fps)
         }
