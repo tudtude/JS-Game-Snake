@@ -1,18 +1,176 @@
 <html>
-
 <head>
     <title>Sanke Game</title>
+    <style>
+        #display {
+            height: 70vh
+        }
+
+        p {
+            font-size: 20px
+        }
+    </style>
 </head>
 
 <body style="text-align:center">
     <h2> Snake game with native javascript and HTML CANVAS </h2>
-    <p> Start game by press up, down, left or right key</p>
     <p id='score'>Your score 0</p>
     <hr>
     <canvas id='display'></canvas>
     <hr>
     <button id='StartGame' onclick="reStartGame()"> Restart Game </button>
-    <script src='./sanke.js'></script>
-</body>
 
+    <script>
+        let display, displayContext, food, scale, snake
+        let score = 0
+        let fps = 5
+        gameDisplay = document.getElementById('display')
+        gameDisplay.width = 200
+        gameDisplay.height = 200
+        displayContext = gameDisplay.getContext('2d')
+
+        scale = 10
+
+        snake = {
+            x: 50,
+            y: 50,
+            show: snakeShow,
+            update: snakeUpdate,
+            direction: null,
+            body: [{
+                x: 50,
+                y: 50
+            }]
+        }
+
+        food = createFood()
+
+        function createFood() {
+            let x, y
+            do {
+                x = Math.floor(Math.random() * gameDisplay.width / scale) * scale
+                y = Math.floor(Math.random() * gameDisplay.height / scale) * scale
+            } while (
+                x == 0 ||
+                x == gameDisplay.width - scale ||
+                y == 0 ||
+                y == gameDisplay.height - scale ||
+                noSnakeLocation( x, y )
+            )
+            return {
+                x: x,
+                y: y
+            }
+        }
+        
+        function noSnakeLocation( x, y ){
+            for ( let i = 0; i < snake.body.length; i ++ ){
+                let s = snake.body[i]
+                if( x == s.x && y == s.y ){
+                    return true
+                    break
+                }
+            }
+            return false
+        }
+        
+        function draw() {
+            console.log('call');
+            backgroundShow()
+            foodShow()
+            snake.show()
+            snake.update()
+        }
+
+        function backgroundShow() {
+            displayContext.fillStyle = 'gray'
+            displayContext.fillRect(0, 0, gameDisplay.width, gameDisplay.height)
+        }
+
+        function snakeShow() {
+            displayContext.fillStyle = 'darkgreen'
+            for (let i = 0; i < snake.body.length; i++) {
+                let s = snake.body[i]
+                displayContext.fillRect(s.x, s.y, scale, scale)
+            }
+        }
+
+        function snakeUpdate() {
+            if (snake.direction == 'up') {
+                snake.y = snake.y - scale
+            } else if (snake.direction == 'down') {
+                snake.y = snake.y + scale
+            } else if (snake.direction == 'left') {
+                snake.x = snake.x - scale
+            } else if (snake.direction == 'right') {
+                snake.x = snake.x + scale
+            }
+
+            // sanke eat
+            if (snake.x == food.x && snake.y == food.y) {
+                food = createFood()
+                score++
+                document.getElementById('score').innerHTML = 'Your score ' + score
+            } else {
+                snake.body.pop()
+            }
+
+            snake.body.unshift({
+                x: snake.x,
+                y: snake.y
+            })
+
+            for (let i = 1; i < snake.body.length; i++) {
+                let s = snake.body[i]
+                if (s.x == snake.x && s.y == snake.y) {
+                    clearInterval(gameInterval)
+                    displayContext.fillStyle = 'darkred'
+                    displayContext.font = '20px Georgia'
+                    displayContext.fillText('Game Over', 100, 150)
+                    break
+                }
+            }
+
+            // snake impact border
+            if (snake.x > gameDisplay.width - scale || snake.x < 0 || snake.y < 0 || snake.y + scale > gameDisplay.height) {
+                clearInterval(gameInterval)
+                displayContext.fillStyle = 'darkred'
+                displayContext.font = '20px Georgia'
+                displayContext.fillText('Game Over', 100, 150)
+            }
+
+
+        }
+
+        function foodShow() {
+            displayContext.fillStyle = 'darkred'
+            displayContext.fillRect(food.x, food.y, scale, scale)
+        }
+        
+        function reStartGame(){
+            food = createFood()
+            snake.x = 50
+            snake.y = 50
+            snake.direction = null
+            snake.body = [{ x: 50, y: 50}]
+            gameInterval = setInterval(draw, 1000 / fps)
+        }
+        
+        draw()
+        gameInterval = setInterval(draw, 1000 / fps)
+        
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.keyCode == 38 && snake.direction != 'down') {
+                snake.direction = 'up'
+            } else if (event.keyCode == 40 && snake.direction != 'up') {
+                snake.direction = 'down'
+            } else if (event.keyCode == 37 && snake.direction != 'right') {
+                snake.direction = 'left'
+            } else if (event.keyCode == 39 && snake.direction != 'left') {
+                snake.direction = 'right'
+            }
+        })
+    </script>
+</body>
 </html>
