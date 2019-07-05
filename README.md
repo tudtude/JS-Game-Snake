@@ -3,6 +3,4 @@
 This game was simple sanke game build with native javascript
 
 ### Online Demo
-https://snake-native-javascript.herokuapp.com/
-
-**Thank https://www.heroku.com/home **
+https://tudtude.github.io/JS-Game-Snake/
